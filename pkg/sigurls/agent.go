@@ -57,6 +57,7 @@ func (agent *Agent) Fetch(domain string, includeSubs bool) chan sources.Result {
 
 			go func(source string, runner sources.Source) {
 				for res := range runner.Run(domain, includeSubs) {
+					res.URL = decodeChars(res.URL)
 					results <- res
 				}
 
