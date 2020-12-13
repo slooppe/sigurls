@@ -47,12 +47,12 @@ func init() {
 		h += "  sigurls [OPTIONS]\n"
 
 		h += "\nOPTIONS:\n"
-		h += "  -d              domain to fetch urls for\n"
-		h += "  -e              comma separated list of sources to exclude\n"
-		h += "  -nc              no color mode\n"
-		h += "  -s              silent mode: output urls only\n"
-		h += "  -subs           include subdomains' urls\n"
-		h += "  -u              comma separated list of sources to use\n"
+		h += "  -d         domain to fetch urls for\n"
+		h += "  -e         comma separated list of sources to exclude\n"
+		h += "  -nc        no color mode\n"
+		h += "  -s         silent mode: output urls only\n"
+		h += "  -subs      include subdomains' urls\n"
+		h += "  -u         comma separated list of sources to use\n"
 
 		fmt.Fprintf(os.Stderr, h)
 	}
