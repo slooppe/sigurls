@@ -1,15 +1,14 @@
 package sigurls
 
 import (
-	"net/url"
 	"strings"
 )
 
 func decodeChars(URL string) string {
-	source, err := url.QueryUnescape(URL)
-	if err == nil {
-		URL = source
-	}
+	// source, err := url.QueryUnescape(URL)
+	// if err == nil {
+	// 	URL = source
+	// }
 
 	// In case json encoded chars
 	replacer := strings.NewReplacer(
