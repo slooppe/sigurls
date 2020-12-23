@@ -27,11 +27,11 @@ type response struct {
 }
 
 // Run returns all URLS found from the source.
-func (source *Source) Run(domain string, includeSubs bool) chan sources.Result {
-	URLS := make(chan sources.Result)
+func (source *Source) Run(domain string, includeSubs bool) chan sources.URLs {
+	URLs := make(chan sources.URLs)
 
 	go func() {
-		defer close(URLS)
+		defer close(URLs)
 
 		for page := 0; ; page++ {
 			req := fasthttp.AcquireRequest()
@@ -63,10 +63,10 @@ func (source *Source) Run(domain string, includeSubs bool) chan sources.Result {
 
 				if parsedURL.ETLDPlus1 == domain {
 					if includeSubs {
-						URLS <- sources.Result{Source: source.Name(), URL: i.URL}
+						URLs <- sources.URLs{Source: source.Name(), Value: i.URL}
 					} else {
 						if parsedURL.SubDomainName == "" || parsedURL.SubDomainName == "www" {
-							URLS <- sources.Result{Source: source.Name(), URL: i.URL}
+							URLs <- sources.URLs{Source: source.Name(), Value: i.URL}
 						}
 					}
 				}
@@ -78,7 +78,7 @@ func (source *Source) Run(domain string, includeSubs bool) chan sources.Result {
 		}
 	}()
 
-	return URLS
+	return URLs
 }
 
 // Name returns the name of the source

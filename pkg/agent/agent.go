@@ -1,4 +1,4 @@
-package sigurls
+package agent
 
 import (
 	"sync"
@@ -15,9 +15,9 @@ type Agent struct {
 	Sources map[string]sources.Source
 }
 
-// NewAgent is a
-func NewAgent(Sources, exclusions []string) *Agent {
-	agent := &Agent{
+// New is a
+func New(Sources, exclusions []string) (agent *Agent) {
+	agent = &Agent{
 		Sources: make(map[string]sources.Source),
 	}
 
@@ -44,11 +44,11 @@ func NewAgent(Sources, exclusions []string) *Agent {
 }
 
 // Fetch is a
-func (agent *Agent) Fetch(domain string, includeSubs bool) chan sources.Result {
-	results := make(chan sources.Result)
+func (agent *Agent) Fetch(domain string, includeSubs bool) chan sources.URLs {
+	URLs := make(chan sources.URLs)
 
 	go func() {
-		defer close(results)
+		defer close(URLs)
 
 		wg := new(sync.WaitGroup)
 
@@ -57,8 +57,7 @@ func (agent *Agent) Fetch(domain string, includeSubs bool) chan sources.Result {
 
 			go func(source string, runner sources.Source) {
 				for res := range runner.Run(domain, includeSubs) {
-					res.URL = decodeChars(res.URL)
-					results <- res
+					URLs <- res
 				}
 
 				wg.Done()
@@ -68,5 +67,5 @@ func (agent *Agent) Fetch(domain string, includeSubs bool) chan sources.Result {
 		wg.Wait()
 	}()
 
-	return results
+	return URLs
 }

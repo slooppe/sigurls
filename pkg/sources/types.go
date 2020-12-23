@@ -1,13 +1,17 @@
 package sources
 
-// Source is an interface inherited by each source
-type Source interface {
-	Run(string, bool) chan Result
-	Name() string
+// URLs is a structure for results
+type URLs struct {
+	Source string
+	Value  string
 }
 
-// Result is a
-type Result struct {
-	Source string
-	URL    string
+// Source is an interface inherited by each source
+type Source interface {
+	// Run takes a domain as argument and a session object
+	// which contains the extractor for subdomains, http client
+	// and other stuff.
+	Run(string, bool) chan URLs
+	// Name returns the name of the source
+	Name() string
 }

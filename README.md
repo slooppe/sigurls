@@ -51,12 +51,13 @@ USAGE:
   sigurls [OPTIONS]
 
 OPTIONS:
-  -d         domain to fetch urls for
-  -e         comma separated list of sources to exclude
-  -nc        no color mode
-  -s         silent mode: output urls only
-  -subs      include subdomains' urls
-  -u         comma separated list of sources to use
+  -d             domain to fetch urls for
+  -exclude       comma separated list of sources to exclude
+  -ls            list all the sources available
+  -nc            no color mode
+  -silent        silent mode: output urls only
+  -subs          include subdomains' urls
+  -use           comma separated list of sources to use
 ```
 
 ## Contribution

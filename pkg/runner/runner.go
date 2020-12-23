@@ -1,51 +1,52 @@
-package sigurls
+package runner
 
 import (
 	"strings"
 
+	"github.com/drsigned/sigurls/pkg/agent"
 	"github.com/drsigned/sigurls/pkg/sources"
 )
 
 // Runner is
 type Runner struct {
 	options *Options
-	agent   *Agent
+	agent   *agent.Agent
 }
 
-// NewRunner is
-func NewRunner(options *Options) *Runner {
+// New is
+func New(options *Options) *Runner {
 	var uses, exclusions []string
 
-	if options.UseSources != "" {
-		uses = append(uses, strings.Split(options.UseSources, ",")...)
+	if options.Use != "" {
+		uses = append(uses, strings.Split(options.Use, ",")...)
 	} else {
 		uses = append(uses, sources.All...)
 	}
 
-	if options.ExcludeSources != "" {
-		exclusions = append(exclusions, strings.Split(options.ExcludeSources, ",")...)
+	if options.Exclude != "" {
+		exclusions = append(exclusions, strings.Split(options.Exclude, ",")...)
 	}
 
 	return &Runner{
 		options: options,
-		agent:   NewAgent(uses, exclusions),
+		agent:   agent.New(uses, exclusions),
 	}
 }
 
 // Run is a
-func (runner *Runner) Run() (chan sources.Result, error) {
-	results := runner.agent.Fetch(runner.options.Domain, runner.options.IncludeSubs)
+func (runner *Runner) Run() (chan sources.URLs, error) {
+	URLs := make(chan sources.URLs)
 
-	URLs := make(chan sources.Result)
-
-	uniqueMap := make(map[string]sources.Result)
+	uniqueMap := make(map[string]sources.URLs)
 	sourceMap := make(map[string]map[string]struct{})
+
+	results := runner.agent.Fetch(runner.options.Domain, runner.options.IncludeSubs)
 
 	go func() {
 		defer close(URLs)
 
 		for result := range results {
-			URL := result.URL
+			URL := result.Value
 
 			if _, exists := uniqueMap[URL]; !exists {
 				sourceMap[URL] = make(map[string]struct{})
@@ -57,7 +58,7 @@ func (runner *Runner) Run() (chan sources.Result, error) {
 				continue
 			}
 
-			hostEntry := sources.Result{URL: URL, Source: result.Source}
+			hostEntry := sources.URLs{Source: result.Source, Value: URL}
 
 			uniqueMap[URL] = hostEntry
 

@@ -68,11 +68,11 @@ func getPagination(domain string, includeSubs bool) (*CommonPaginationResult, er
 }
 
 // Run function returns all subdomains found with the service
-func (source *Source) Run(domain string, includeSubs bool) chan sources.Result {
-	URLS := make(chan sources.Result)
+func (source *Source) Run(domain string, includeSubs bool) chan sources.URLs {
+	URLs := make(chan sources.URLs)
 
 	go func() {
-		defer close(URLS)
+		defer close(URLs)
 
 		// collinfo
 		req := fasthttp.AcquireRequest()
@@ -134,12 +134,12 @@ func (source *Source) Run(domain string, includeSubs bool) chan sources.Result {
 					return
 				}
 
-				URLS <- sources.Result{Source: source.Name(), URL: result.URL}
+				URLs <- sources.URLs{Source: source.Name(), Value: result.URL}
 			}
 		}
 	}()
 
-	return URLS
+	return URLs
 }
 
 // Name returns the name of the source

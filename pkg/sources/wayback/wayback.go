@@ -13,11 +13,11 @@ import (
 type Source struct{}
 
 // Run returns all URLS found from the source.
-func (source *Source) Run(domain string, includeSubs bool) chan sources.Result {
-	URLS := make(chan sources.Result)
+func (source *Source) Run(domain string, includeSubs bool) chan sources.URLs {
+	URLs := make(chan sources.URLs)
 
 	go func() {
-		defer close(URLS)
+		defer close(URLs)
 
 		if includeSubs {
 			domain = "*." + domain
@@ -41,17 +41,17 @@ func (source *Source) Run(domain string, includeSubs bool) chan sources.Result {
 		scanner := bufio.NewScanner(bytes.NewReader(res.Body()))
 
 		for scanner.Scan() {
-			line := scanner.Text()
+			URL := scanner.Text()
 
-			if line == "" {
+			if URL == "" {
 				continue
 			}
 
-			URLS <- sources.Result{Source: source.Name(), URL: line}
+			URLs <- sources.URLs{Source: source.Name(), Value: URL}
 		}
 	}()
 
-	return URLS
+	return URLs
 }
 
 // Name returns the name of the source
