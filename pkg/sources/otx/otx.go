@@ -3,10 +3,11 @@ package otx
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/drsigned/gos"
+	"github.com/drsigned/sigurls/pkg/session"
 	"github.com/drsigned/sigurls/pkg/sources"
-	"github.com/valyala/fasthttp"
 )
 
 // Source is a
@@ -27,31 +28,26 @@ type response struct {
 }
 
 // Run returns all URLS found from the source.
-func (source *Source) Run(domain string, includeSubs bool) chan sources.URLs {
+func (source *Source) Run(domain string, ses *session.Session, includeSubs bool) chan sources.URLs {
 	URLs := make(chan sources.URLs)
 
 	go func() {
 		defer close(URLs)
 
 		for page := 0; ; page++ {
-			req := fasthttp.AcquireRequest()
-			res := fasthttp.AcquireResponse()
-
-			defer func() {
-				fasthttp.ReleaseRequest(req)
-				fasthttp.ReleaseResponse(res)
-			}()
-
-			req.SetRequestURI(fmt.Sprintf("https://otx.alienvault.com/api/v1/indicators/domain/%s/url_list?limit=%d&page=%d", domain, 200, page))
-
-			client := &fasthttp.Client{}
-			if err := client.Do(req, res); err != nil {
+			res, err := ses.SimpleGet(fmt.Sprintf("https://otx.alienvault.com/api/v1/indicators/domain/%s/url_list?limit=%d&page=%d", domain, 200, page))
+			if err != nil {
+				ses.DiscardHTTPResponse(res)
 				return
 			}
 
+			defer res.Body.Close()
+
 			var results response
 
-			if err := json.Unmarshal(res.Body(), &results); err != nil {
+			body, err := ioutil.ReadAll(res.Body)
+
+			if err := json.Unmarshal(body, &results); err != nil {
 				return
 			}
 

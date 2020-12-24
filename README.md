@@ -2,7 +2,7 @@
 
 ![made with go](https://img.shields.io/badge/made%20with-Go-0040ff.svg) ![maintenance](https://img.shields.io/badge/maintained%3F-yes-0040ff.svg) [![open issues](https://img.shields.io/github/issues-raw/drsigned/sigurls.svg?style=flat&color=0040ff)](https://github.com/drsigned/sigurls/issues?q=is:issue+is:open) [![closed issues](https://img.shields.io/github/issues-closed-raw/drsigned/sigurls.svg?style=flat&color=0040ff)](https://github.com/drsigned/sigurls/issues?q=is:issue+is:closed) [![license](https://img.shields.io/badge/license-MIT-gray.svg?colorB=0040FF)](https://github.com/drsigned/sigurls/blob/master/LICENSE) [![twitter](https://img.shields.io/badge/twitter-@drsigned-0040ff.svg)](https://twitter.com/drsigned)
 
-sigurls fetches known URLs from **AlienVault's OTX**, **Common Crawl**, **URLScan** and the **Wayback Machine** for any given domain.
+sigurls is a reconnaissance tool, it fetches URLs from **AlienVault's OTX**, **Common Crawl**, **URLScan**, **Github** and the **Wayback Machine** for a given domain.
 
 ## Resources
 
@@ -10,6 +10,8 @@ sigurls fetches known URLs from **AlienVault's OTX**, **Common Crawl**, **URLSca
     * [From Binary](#from-binary)
     * [From source](#from-source)
     * [From github](#from-github)
+* [Post Installtion](#post-installation)
+    * [Config File](#config-file)
 * [Usage](#usage)
 * [Contribution](#contribution)
 
@@ -31,6 +33,22 @@ $ GO111MODULE=on go get -u -v github.com/drsigned/sigurls/cmd/sigurls
 
 ```bash
 $ git clone https://github.com/drsigned/sigurls.git; cd sigurls/cmd/sigurls/; go build; mv sigurls /usr/local/bin/; sigurls -h
+```
+
+## Post Installation
+
+#### Config File
+
+sigurls' configuration file is located at `$HOME/.config/sigurls/conf.yaml` - created during the first run - and has the contents:
+
+```yaml
+version: 1.2.0
+sources:
+    - commoncrawl
+    - github
+    - otx
+    - urlscan
+    - wayback
 ```
 
 ## Usage

@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/drsigned/sigurls/pkg/session"
 	"github.com/drsigned/sigurls/pkg/sources"
 	"gopkg.in/yaml.v3"
 )
@@ -14,6 +15,9 @@ type Configuration struct {
 	Version string `yaml:"version"`
 	// Sources contains a list of sources to use for enumeration
 	Sources []string `yaml:"sources"`
+	Keys    struct {
+		GitHub []string `yaml:"github"`
+	}
 }
 
 // Options is a
@@ -119,4 +123,17 @@ func UnmarshalRead(file string) (Configuration, error) {
 	f.Close()
 
 	return config, err
+}
+
+// GetKeys gets the API keys from config file and creates a Keys struct
+// We use random selection of api keys from the list of keys supplied.
+// Keys that require 2 options are separated by colon (:).
+func (config *Configuration) GetKeys() session.Keys {
+	keys := session.Keys{}
+
+	if len(config.Keys.GitHub) > 0 {
+		keys.GitHub = config.Keys.GitHub
+	}
+
+	return keys
 }

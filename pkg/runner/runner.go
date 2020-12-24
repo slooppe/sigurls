@@ -40,7 +40,8 @@ func (runner *Runner) Run() (chan sources.URLs, error) {
 	uniqueMap := make(map[string]sources.URLs)
 	sourceMap := make(map[string]map[string]struct{})
 
-	results := runner.agent.Fetch(runner.options.Domain, runner.options.IncludeSubs)
+	keys := runner.options.YAMLConfig.GetKeys()
+	results := runner.agent.Fetch(runner.options.Domain, keys, runner.options.IncludeSubs)
 
 	go func() {
 		defer close(URLs)
