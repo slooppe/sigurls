@@ -60,6 +60,8 @@ func init() {
 		h += "  -subs          include subdomains' urls\n"
 		h += "  -use           comma(,) separated list of sources to use\n"
 
+		h += "\n HAPPY HACKING :)\n\n"
+
 		fmt.Fprintf(os.Stderr, h)
 	}
 

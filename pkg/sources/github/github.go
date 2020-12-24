@@ -15,7 +15,6 @@ import (
 	"github.com/drsigned/sigurls/pkg/session"
 	"github.com/drsigned/sigurls/pkg/sources"
 	"github.com/tomnomnom/linkheader"
-	"github.com/valyala/fasthttp"
 )
 
 // Source is the passive sources agent
@@ -127,7 +126,7 @@ func proccesItems(items []item, domainRegexp *regexp.Regexp, name string, ses *s
 			return err
 		}
 
-		if res.StatusCode == fasthttp.StatusOK {
+		if res.StatusCode == http.StatusOK {
 			scanner := bufio.NewScanner(res.Body)
 			for scanner.Scan() {
 				line := scanner.Text()
@@ -135,38 +134,18 @@ func proccesItems(items []item, domainRegexp *regexp.Regexp, name string, ses *s
 					continue
 				}
 
-				for _, subdomain := range domainRegexp.FindAllString(normalizeContent(line), -1) {
-					y := strings.ReplaceAll(subdomain, "&quot;", "\"")
-					y = strings.ReplaceAll(y, "/>", "\"")
-					y = strings.ReplaceAll(y, "'", "\"")
-					y = strings.ReplaceAll(y, "`", "\"")
-					y = strings.ReplaceAll(y, ",", "\"")
-					y = strings.ReplaceAll(y, "*", "\"")
-					y = strings.ReplaceAll(y, ")", "\"")
-					y = strings.ReplaceAll(y, "<", "\"")
-					y = strings.ReplaceAll(y, ">", "\"")
-					y = strings.ReplaceAll(y, "]", "\"")
-					x := strings.Split(y, "\"")
-					URLs <- sources.URLs{Source: name, Value: x[0]}
+				for _, URL := range domainRegexp.FindAllString(normalizeContent(line), -1) {
+					URL = sources.NormalizeURL(URL)
+					URLs <- sources.URLs{Source: name, Value: URL}
 				}
 			}
 		}
 
 		// find subdomains in text matches
 		for _, textMatch := range item.TextMatches {
-			for _, subdomain := range domainRegexp.FindAllString(normalizeContent(textMatch.Fragment), -1) {
-				y := strings.ReplaceAll(subdomain, "&quot;", "\"")
-				y = strings.ReplaceAll(y, "/>", "\"")
-				y = strings.ReplaceAll(y, "'", "\"")
-				y = strings.ReplaceAll(y, "`", "\"")
-				y = strings.ReplaceAll(y, ",", "\"")
-				y = strings.ReplaceAll(y, "*", "\"")
-				y = strings.ReplaceAll(y, ")", "\"")
-				y = strings.ReplaceAll(y, "<", "\"")
-				y = strings.ReplaceAll(y, ">", "\"")
-				y = strings.ReplaceAll(y, "]", "\"")
-				x := strings.Split(y, "\"")
-				URLs <- sources.URLs{Source: name, Value: x[0]}
+			for _, URL := range domainRegexp.FindAllString(normalizeContent(textMatch.Fragment), -1) {
+				URL = sources.NormalizeURL(URL)
+				URLs <- sources.URLs{Source: name, Value: URL}
 			}
 		}
 	}
@@ -188,13 +167,15 @@ func rawContentURL(URL string) string {
 
 // DomainRegexp regular expression to match subdomains in github files code
 func domainRegexp(host string, includeSubs bool) (URLRegex *regexp.Regexp) {
-	escapedHost := strings.ReplaceAll(host, ".", "\\.")
+	// escapedHost := strings.ReplaceAll(host, ".", "\\.")
 
-	if includeSubs {
-		URLRegex = regexp.MustCompile(fmt.Sprintf(`(https?)://[^\s?#\/]*%s/?[^\s]*`, escapedHost))
-	} else {
-		URLRegex = regexp.MustCompile(fmt.Sprintf(`(https?)://[^\s?#\/]%s/?[^\s]*`, escapedHost))
-	}
+	URLRegex = regexp.MustCompile(`(?:"|')(((?:[a-zA-Z]{1,10}://|//)[^"'/]{1,}\.[a-zA-Z]{2,}[^"']{0,})|((?:/|\.\./|\./)[^"'><,;| *()(%%$^/\\\[\]][^"'><,;|()]{1,})|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{1,}\.(?:[a-zA-Z]{1,4}|action)(?:[\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{3,}(?:[\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-]{1,}\.(?:php|asp|aspx|jsp|json|action|html|js|txt|xml)(?:[\?|#][^"|']{0,}|)))(?:"|')`)
+
+	// if includeSubs {
+	// 	URLRegex = regexp.MustCompile(fmt.Sprintf(`(https?)://[^\s?#\/]*%s/?[^\s]*`, escapedHost))
+	// } else {
+	// 	URLRegex = regexp.MustCompile(fmt.Sprintf(`(https?)://[^\s?#\/]%s/?[^\s]*`, escapedHost))
+	// }
 
 	return URLRegex
 }

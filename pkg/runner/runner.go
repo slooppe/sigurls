@@ -41,7 +41,7 @@ func (runner *Runner) Run() (chan sources.URLs, error) {
 	sourceMap := make(map[string]map[string]struct{})
 
 	keys := runner.options.YAMLConfig.GetKeys()
-	results := runner.agent.Fetch(runner.options.Domain, keys, runner.options.IncludeSubs)
+	results := runner.agent.Run(runner.options.Domain, keys, runner.options.IncludeSubs)
 
 	go func() {
 		defer close(URLs)

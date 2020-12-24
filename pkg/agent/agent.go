@@ -47,8 +47,8 @@ func New(Sources, exclusions []string) (agent *Agent) {
 	return agent
 }
 
-// Fetch is a
-func (agent *Agent) Fetch(domain string, keys session.Keys, includeSubs bool) chan sources.URLs {
+// Run is a
+func (agent *Agent) Run(domain string, keys session.Keys, includeSubs bool) chan sources.URLs {
 	URLs := make(chan sources.URLs)
 
 	go func() {
