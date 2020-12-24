@@ -4,8 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net/url"
 	"os"
+	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/drsigned/sigurls/pkg/runner"
 	"github.com/logrusorgru/aurora/v3"
@@ -77,8 +79,24 @@ func main() {
 	}
 
 	if co.listSources {
+		fmt.Println("[", au.BrightBlue("INF"), "] current list of the available", au.Underline(strconv.Itoa(len(options.YAMLConfig.Sources))+" sources").Bold())
+		fmt.Println("[", au.BrightBlue("INF"), "] sources marked with an * needs key or token")
+		fmt.Println("")
+
+		keys := options.YAMLConfig.GetKeys()
+		needsKey := make(map[string]interface{})
+		keysElem := reflect.ValueOf(&keys).Elem()
+
+		for i := 0; i < keysElem.NumField(); i++ {
+			needsKey[strings.ToLower(keysElem.Type().Field(i).Name)] = keysElem.Field(i).Interface()
+		}
+
 		for _, source := range options.YAMLConfig.Sources {
-			fmt.Println(">", source)
+			if _, ok := needsKey[source]; ok {
+				fmt.Println(">", source, "*")
+			} else {
+				fmt.Println(">", source)
+			}
 		}
 
 		os.Exit(0)
@@ -95,18 +113,17 @@ func main() {
 	}
 
 	runner := runner.New(options)
+
 	URLs, err := runner.Run()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	for n := range URLs {
-		u, _ := url.Parse(n.Value)
-
+	for URL := range URLs {
 		if co.silent {
-			fmt.Println(u)
+			fmt.Println(URL)
 		} else {
-			fmt.Println(fmt.Sprintf("[%s] %s", au.BrightBlue(n.Source), n.Value))
+			fmt.Println(fmt.Sprintf("[%s] %s", au.BrightBlue(URL.Source), URL.Value))
 		}
 	}
 }

@@ -55,23 +55,6 @@ func (session *Session) Get(getURL string, headers map[string]string) (*http.Res
 	return session.HTTPRequest(http.MethodGet, getURL, headers, nil)
 }
 
-// Request makes any HTTP request to a URL with extended parameters
-// func (session *Session) Request(method, requestURL, cookies string, headers map[string]string, body io.Reader) (*http.Response, error) {
-// 	req := fasthttp.AcquireRequest()
-
-// 	req.SetRequestURI(requestURL)
-
-// 	if cookies != "" {
-// 		req.Header.Set("Cookie", cookies)
-// 	}
-
-// 	for key, value := range headers {
-// 		req.Header.Add(key, value)
-// 	}
-
-// 	return httpRequestWrapper(session.Client, req)
-// }
-
 // HTTPRequest makes any HTTP request to a URL with extended parameters
 func (session *Session) HTTPRequest(method, requestURL string, headers map[string]string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest(method, requestURL, body)
@@ -83,14 +66,6 @@ func (session *Session) HTTPRequest(method, requestURL string, headers map[strin
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Accept-Language", "en")
 	req.Header.Set("Connection", "close")
-
-	// if basicAuth.Username != "" || basicAuth.Password != "" {
-	// 	req.SetBasicAuth(basicAuth.Username, basicAuth.Password)
-	// }
-
-	// if cookies != "" {
-	// 	req.Header.Set("Cookie", cookies)
-	// }
 
 	for key, value := range headers {
 		req.Header.Set(key, value)
