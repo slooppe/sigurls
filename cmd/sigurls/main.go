@@ -14,7 +14,7 @@ import (
 )
 
 type options struct {
-	listSources bool
+	sourcesList bool
 	noColor     bool
 	silent      bool
 }
@@ -38,12 +38,12 @@ func banner() {
 
 func init() {
 	flag.StringVar(&so.Domain, "d", "", "")
-	flag.StringVar(&so.Exclude, "exclude", "", "")
-	flag.BoolVar(&co.listSources, "ls", false, "")
-	flag.BoolVar(&co.noColor, "nc", false, "")
+	flag.StringVar(&so.SourcesExclude, "sE", "", "")
+	flag.BoolVar(&so.IncludeSubs, "iS", false, "")
+	flag.BoolVar(&co.sourcesList, "sL", false, "")
+	flag.BoolVar(&co.noColor, "nC", false, "")
 	flag.BoolVar(&co.silent, "silent", false, "")
-	flag.BoolVar(&so.IncludeSubs, "subs", false, "")
-	flag.StringVar(&so.Use, "use", "", "")
+	flag.StringVar(&so.SourcesUse, "sU", "", "")
 
 	flag.Usage = func() {
 		banner()
@@ -53,14 +53,12 @@ func init() {
 
 		h += "\nOPTIONS:\n"
 		h += "  -d             domain to fetch urls for\n"
-		h += "  -exclude       comma(,) separated list of sources to exclude\n"
-		h += "  -ls            list all the available sources\n"
-		h += "  -nc            no color mode\n"
+		h += "  -sE            comma(,) separated list of sources to exclude\n"
+		h += "  -iS            include subdomains' urls\n"
+		h += "  -sL            list all the available sources\n"
+		h += "  -nC            no color mode\n"
 		h += "  -silent        silent mode: output urls only\n"
-		h += "  -subs          include subdomains' urls\n"
-		h += "  -use           comma(,) separated list of sources to use\n"
-
-		h += "\n HAPPY HACKING :)\n\n"
+		h += "  -sU            comma(,) separated list of sources to use\n\n"
 
 		fmt.Fprintf(os.Stderr, h)
 	}
@@ -80,7 +78,7 @@ func main() {
 		banner()
 	}
 
-	if co.listSources {
+	if co.sourcesList {
 		fmt.Println("[", au.BrightBlue("INF"), "] current list of the available", au.Underline(strconv.Itoa(len(options.YAMLConfig.Sources))+" sources").Bold())
 		fmt.Println("[", au.BrightBlue("INF"), "] sources marked with an * needs key or token")
 		fmt.Println("")
@@ -101,6 +99,7 @@ func main() {
 			}
 		}
 
+		fmt.Println("")
 		os.Exit(0)
 	}
 

@@ -8,8 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"time"
-
-	"github.com/projectdiscovery/gologger"
 )
 
 // Keys contains the current API Keys we have in store
@@ -17,17 +15,24 @@ type Keys struct {
 	GitHub []string `json:"github"`
 }
 
+// Scope is the scope contorl structure
+type Scope struct {
+	Domain      string
+	IncludeSubs bool
+}
+
 // Session is the option passed to the source, an option is created
 // uniquely for eac source.
 type Session struct {
-	// Keys is the API keys for the application
-	Keys Keys
+	Scope Scope
 	// Client is the current http client
 	Client *http.Client
+	// Keys is the API keys for the application
+	Keys Keys
 }
 
 // New creates a new session object for a domain
-func New(domain string, timeout int, keys Keys) (*Session, error) {
+func New(domain string, includeSubs bool, timeout int, keys Keys) (*Session, error) {
 	client := &http.Client{
 		Transport: &http.Transport{
 			MaxIdleConns:        100,
@@ -40,6 +45,10 @@ func New(domain string, timeout int, keys Keys) (*Session, error) {
 	}
 
 	return &Session{
+		Scope: Scope{
+			Domain:      domain,
+			IncludeSubs: includeSubs,
+		},
 		Client: client,
 		Keys:   keys,
 	}, nil
@@ -79,7 +88,6 @@ func (session *Session) DiscardHTTPResponse(response *http.Response) {
 	if response != nil {
 		_, err := io.Copy(ioutil.Discard, response.Body)
 		if err != nil {
-			gologger.Warningf("Could not discard response body: %s\n", err)
 			return
 		}
 		response.Body.Close()

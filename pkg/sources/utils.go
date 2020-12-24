@@ -1,9 +1,13 @@
 package sources
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/drsigned/gos"
+)
 
 // NormalizeURL is a
-func NormalizeURL(URL string) string {
+func NormalizeURL(URL, domain string, includeSubs bool) (string, bool) {
 	// Remove the single and double quotes from the parsed link on the ends
 	URL = strings.Trim(URL, "\"")
 	URL = strings.Trim(URL, "'")
@@ -11,5 +15,14 @@ func NormalizeURL(URL string) string {
 	URL = strings.TrimRight(URL, "/")
 	URL = strings.Trim(URL, " ")
 
-	return URL
+	parsedURL, err := gos.ParseURL(URL)
+	if err != nil {
+		return URL, false
+	}
+
+	if parsedURL.Host == "" || parsedURL.ETLDPlus1 != domain {
+		return URL, false
+	}
+
+	return parsedURL.String(), true
 }

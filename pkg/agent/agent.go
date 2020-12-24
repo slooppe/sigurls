@@ -54,7 +54,7 @@ func (agent *Agent) Run(domain string, keys session.Keys, includeSubs bool) chan
 	go func() {
 		defer close(URLs)
 
-		ses, err := session.New(domain, 10, keys)
+		ses, err := session.New(domain, includeSubs, 10, keys)
 		if err != nil {
 			return
 		}

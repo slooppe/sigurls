@@ -135,8 +135,9 @@ func proccesItems(items []item, domainRegexp *regexp.Regexp, name string, ses *s
 				}
 
 				for _, URL := range domainRegexp.FindAllString(normalizeContent(line), -1) {
-					URL = sources.NormalizeURL(URL)
-					URLs <- sources.URLs{Source: name, Value: URL}
+					if URL, ok := sources.NormalizeURL(URL, ses.Scope.Domain, ses.Scope.IncludeSubs); ok {
+						URLs <- sources.URLs{Source: name, Value: URL}
+					}
 				}
 			}
 		}
@@ -144,8 +145,9 @@ func proccesItems(items []item, domainRegexp *regexp.Regexp, name string, ses *s
 		// find subdomains in text matches
 		for _, textMatch := range item.TextMatches {
 			for _, URL := range domainRegexp.FindAllString(normalizeContent(textMatch.Fragment), -1) {
-				URL = sources.NormalizeURL(URL)
-				URLs <- sources.URLs{Source: name, Value: URL}
+				if URL, ok := sources.NormalizeURL(URL, ses.Scope.Domain, ses.Scope.IncludeSubs); ok {
+					URLs <- sources.URLs{Source: name, Value: URL}
+				}
 			}
 		}
 	}
@@ -167,16 +169,7 @@ func rawContentURL(URL string) string {
 
 // DomainRegexp regular expression to match subdomains in github files code
 func domainRegexp(host string, includeSubs bool) (URLRegex *regexp.Regexp) {
-	// escapedHost := strings.ReplaceAll(host, ".", "\\.")
-
 	URLRegex = regexp.MustCompile(`(?:"|')(((?:[a-zA-Z]{1,10}://|//)[^"'/]{1,}\.[a-zA-Z]{2,}[^"']{0,})|((?:/|\.\./|\./)[^"'><,;| *()(%%$^/\\\[\]][^"'><,;|()]{1,})|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{1,}\.(?:[a-zA-Z]{1,4}|action)(?:[\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-/]{1,}/[a-zA-Z0-9_\-/]{3,}(?:[\?|#][^"|']{0,}|))|([a-zA-Z0-9_\-]{1,}\.(?:php|asp|aspx|jsp|json|action|html|js|txt|xml)(?:[\?|#][^"|']{0,}|)))(?:"|')`)
-
-	// if includeSubs {
-	// 	URLRegex = regexp.MustCompile(fmt.Sprintf(`(https?)://[^\s?#\/]*%s/?[^\s]*`, escapedHost))
-	// } else {
-	// 	URLRegex = regexp.MustCompile(fmt.Sprintf(`(https?)://[^\s?#\/]%s/?[^\s]*`, escapedHost))
-	// }
-
 	return URLRegex
 }
 

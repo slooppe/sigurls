@@ -22,10 +22,10 @@ type Configuration struct {
 
 // Options is a
 type Options struct {
-	Domain      string
-	Exclude     string
-	IncludeSubs bool
-	Use         string
+	Domain         string
+	SourcesExclude string
+	IncludeSubs    bool
+	SourcesUse     string
 
 	YAMLConfig Configuration
 }

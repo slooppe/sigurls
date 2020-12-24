@@ -17,14 +17,14 @@ type Runner struct {
 func New(options *Options) *Runner {
 	var uses, exclusions []string
 
-	if options.Use != "" {
-		uses = append(uses, strings.Split(options.Use, ",")...)
+	if options.SourcesUse != "" {
+		uses = append(uses, strings.Split(options.SourcesUse, ",")...)
 	} else {
 		uses = append(uses, sources.All...)
 	}
 
-	if options.Exclude != "" {
-		exclusions = append(exclusions, strings.Split(options.Exclude, ",")...)
+	if options.SourcesExclude != "" {
+		exclusions = append(exclusions, strings.Split(options.SourcesExclude, ",")...)
 	}
 
 	return &Runner{
