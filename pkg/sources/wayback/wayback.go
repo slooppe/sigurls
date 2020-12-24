@@ -2,18 +2,19 @@ package wayback
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
+	"net/url"
+	"strings"
 
+	"github.com/drsigned/sigurls/pkg/session"
 	"github.com/drsigned/sigurls/pkg/sources"
-	"github.com/valyala/fasthttp"
 )
 
 // Source is a
 type Source struct{}
 
 // Run returns all URLS found from the source.
-func (source *Source) Run(domain string, includeSubs bool) chan sources.URLs {
+func (source *Source) Run(domain string, ses *session.Session, includeSubs bool) chan sources.URLs {
 	URLs := make(chan sources.URLs)
 
 	go func() {
@@ -23,31 +24,35 @@ func (source *Source) Run(domain string, includeSubs bool) chan sources.URLs {
 			domain = "*." + domain
 		}
 
-		req := fasthttp.AcquireRequest()
-		res := fasthttp.AcquireResponse()
-
-		defer func() {
-			fasthttp.ReleaseRequest(req)
-			fasthttp.ReleaseResponse(res)
-		}()
-
-		req.SetRequestURI(fmt.Sprintf("http://web.archive.org/cdx/search/cdx?url=%s/*&output=txt&fl=original&collapse=urlkey", domain))
-
-		client := &fasthttp.Client{}
-		if err := client.Do(req, res); err != nil {
+		res, err := ses.SimpleGet(fmt.Sprintf("http://web.archive.org/cdx/search/cdx?url=%s/*&output=txt&fl=original&collapse=urlkey", domain))
+		if err != nil {
+			ses.DiscardHTTPResponse(res)
 			return
 		}
 
-		scanner := bufio.NewScanner(bytes.NewReader(res.Body()))
+		defer res.Body.Close()
+
+		scanner := bufio.NewScanner(res.Body)
 
 		for scanner.Scan() {
 			URL := scanner.Text()
-
 			if URL == "" {
 				continue
 			}
 
-			URLs <- sources.URLs{Source: source.Name(), Value: URL}
+			URL, err = url.QueryUnescape(URL)
+			if err != nil {
+				return
+			}
+
+			if URL != "" {
+				// fix for triple encoded URL
+				URL = strings.ToLower(URL)
+				URL = strings.TrimPrefix(URL, "25")
+				URL = strings.TrimPrefix(URL, "2f")
+
+				URLs <- sources.URLs{Source: source.Name(), Value: URL}
+			}
 		}
 	}()
 

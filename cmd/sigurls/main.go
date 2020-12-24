@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 
 	"github.com/drsigned/sigurls/pkg/runner"
@@ -100,8 +101,10 @@ func main() {
 	}
 
 	for n := range URLs {
+		u, _ := url.Parse(n.Value)
+
 		if co.silent {
-			fmt.Println(n.Value)
+			fmt.Println(u)
 		} else {
 			fmt.Println(fmt.Sprintf("[%s] %s", au.BrightBlue(n.Source), n.Value))
 		}
