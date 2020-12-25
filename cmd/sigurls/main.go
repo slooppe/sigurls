@@ -31,7 +31,7 @@ func banner() {
  ___(_) __ _ _   _ _ __| |___
 / __| |/ _`+"`"+` | | | | '__| / __|
 \__ \ | (_| | |_| | |  | \__ \
-|___/_|\__, |\__,_|_|  |_|___/ v1.3.0
+|___/_|\__, |\__,_|_|  |_|___/ v1.3.1
        |___/
 `).Bold())
 }
@@ -122,7 +122,7 @@ func main() {
 
 	for URL := range URLs {
 		if co.silent {
-			fmt.Println(URL)
+			fmt.Println(URL.Value)
 		} else {
 			fmt.Println(fmt.Sprintf("[%s] %s", au.BrightBlue(URL.Source), URL.Value))
 		}
