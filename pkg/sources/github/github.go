@@ -135,7 +135,7 @@ func proccesItems(items []item, domainRegexp *regexp.Regexp, name string, ses *s
 				}
 
 				for _, URL := range domainRegexp.FindAllString(normalizeContent(line), -1) {
-					if URL, ok := sources.NormalizeURL(URL, ses.Scope.Domain, ses.Scope.IncludeSubs); ok {
+					if URL, ok := sources.NormalizeURL(URL, ses.Scope); ok {
 						URLs <- sources.URLs{Source: name, Value: URL}
 					}
 				}
@@ -145,7 +145,7 @@ func proccesItems(items []item, domainRegexp *regexp.Regexp, name string, ses *s
 		// find subdomains in text matches
 		for _, textMatch := range item.TextMatches {
 			for _, URL := range domainRegexp.FindAllString(normalizeContent(textMatch.Fragment), -1) {
-				if URL, ok := sources.NormalizeURL(URL, ses.Scope.Domain, ses.Scope.IncludeSubs); ok {
+				if URL, ok := sources.NormalizeURL(URL, ses.Scope); ok {
 					URLs <- sources.URLs{Source: name, Value: URL}
 				}
 			}

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/drsigned/gos"
 	"github.com/drsigned/sigurls/pkg/session"
 	"github.com/drsigned/sigurls/pkg/sources"
 )
@@ -52,19 +51,8 @@ func (source *Source) Run(domain string, ses *session.Session, includeSubs bool)
 			}
 
 			for _, i := range results.URLList {
-				parsedURL, err := gos.ParseURL(i.URL)
-				if err != nil {
-					continue
-				}
-
-				if parsedURL.ETLDPlus1 == domain {
-					if includeSubs {
-						URLs <- sources.URLs{Source: source.Name(), Value: i.URL}
-					} else {
-						if parsedURL.SubDomainName == "" || parsedURL.SubDomainName == "www" {
-							URLs <- sources.URLs{Source: source.Name(), Value: i.URL}
-						}
-					}
+				if URL, ok := sources.NormalizeURL(i.URL, ses.Scope); ok {
+					URLs <- sources.URLs{Source: source.Name(), Value: URL}
 				}
 			}
 

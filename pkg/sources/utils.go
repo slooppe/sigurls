@@ -3,11 +3,13 @@ package sources
 import (
 	"strings"
 
+	"github.com/drsigned/sigurls/pkg/session"
+
 	"github.com/drsigned/gos"
 )
 
 // NormalizeURL is a
-func NormalizeURL(URL, domain string, includeSubs bool) (string, bool) {
+func NormalizeURL(URL string, scope session.Scope) (string, bool) {
 	// Remove the single and double quotes from the parsed link on the ends
 	URL = strings.Trim(URL, "\"")
 	URL = strings.Trim(URL, "'")
@@ -20,8 +22,14 @@ func NormalizeURL(URL, domain string, includeSubs bool) (string, bool) {
 		return URL, false
 	}
 
-	if parsedURL.Host == "" || parsedURL.ETLDPlus1 != domain {
+	if parsedURL.ETLDPlus1 == "" || parsedURL.ETLDPlus1 != scope.Domain {
 		return URL, false
+	}
+
+	if !scope.IncludeSubs {
+		if parsedURL.Host != scope.Domain && parsedURL.Host != "www."+scope.Domain {
+			return URL, false
+		}
 	}
 
 	return parsedURL.String(), true
