@@ -25,7 +25,7 @@ $ sigurls -h
  ___(_) __ _ _   _ _ __| |___
 / __| |/ _` | | | | '__| / __|
 \__ \ | (_| | |_| | |  | \__ \
-|___/_|\__, |\__,_|_|  |_|___/ v1.2.0
+|___/_|\__, |\__,_|_|  |_|___/ v1.3.0
        |___/
 
 USAGE:
@@ -33,12 +33,12 @@ USAGE:
 
 OPTIONS:
   -d             domain to fetch urls for
-  -exclude       comma separated list of sources to exclude
-  -ls            list all the sources available
-  -nc            no color mode
+  -sE            comma(,) separated list of sources to exclude
+  -iS            include subdomains' urls
+  -sL            list all the available sources
+  -nC            no color mode
   -silent        silent mode: output urls only
-  -subs          include subdomains' urls
-  -use           comma separated list of sources to use
+  -sU            comma(,) separated list of sources to use
 ```
 
 ## Installation
@@ -68,7 +68,7 @@ sigurls will work after [installation](#installation). However, to configure sig
 Example:
 
 ```yaml
-version: 1.2.0
+version: 1.3.0
 sources:
     - commoncrawl
     - github
